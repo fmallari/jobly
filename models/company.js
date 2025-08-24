@@ -89,7 +89,7 @@ class Company {
       // Finalize query and return result 
 
       query += " ORDER BY name ";
-      const companiesRes = await db.query(query,. queryValues);
+      const companiesRes = await db.query(query, queryValues);
       return companiesRes.rows;
   }
 
