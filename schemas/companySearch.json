@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "nameLike": { "type": "string" },
+    "minEmployees": { "type": "integer", "minimum": 0 },
+    "maxEmployees": { "type": "integer", "minimum": 0 }
+  },
+  "additionalProperties": false
+}

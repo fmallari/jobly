@@ -25,6 +25,19 @@ app.use("/auth", authRoutes);
 app.use("/companies", companiesRoutes);
 app.use("/users", usersRoutes);
 
+app.get("/", function (req, res) {
+  return res.json({
+    status: "ok",
+    service: "jobly-api",
+    docs: {
+      companies: "/companies",
+      jobs: "/jobs",
+      authToken: "POST /auth/token",
+      authRegister: "POST /auth/register"
+    }
+  });
+});
+
 
 /** Handle 404 errors -- this matches everything */
 app.use(function (req, res, next) {
