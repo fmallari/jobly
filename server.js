@@ -1,8 +1,9 @@
 "use strict";
 
 const app = require("./app");
-const { PORT } = require("./config");
 
-app.listen(PORT, function () {
-  console.log(`Started on http://localhost:${PORT}`);
+const port = process.env.PORT || 3001;
+
+app.listen(port, "0.0.0.0", function () {
+  console.log(`Server started on port ${port}`);
 });
