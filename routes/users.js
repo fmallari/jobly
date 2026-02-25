@@ -10,8 +10,10 @@ const User = require("../models/user");
 const { createToken } = require("../helpers/tokens");
 const userNewSchema = require("../schemas/userNew.json");
 const userUpdateSchema = require("../schemas/userUpdate.json");
+const db = require("../db");
 
 const router = express.Router();
+
 
 
 /** POST / { user }  => { user, token }
@@ -112,6 +114,53 @@ router.delete("/:username", ensureCorrectUserOrAdmin, async function (req, res, 
   try {
     await User.remove(req.params.username);
     return res.json({ deleted: req.params.username });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+//Setting up for job applications when user is signed in and is apply for a job. 
+
+// POST /users/:username/jobs/:id
+router.post("/:username/jobs/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
+  try {
+    const { username, id } = req.params;
+
+    await db.query(
+      `INSERT INTO applications (username, job_id)
+       VALUES ($1, $2)
+       ON CONFLICT (username, job_id) DO NOTHING`,
+      [username, Number(id)]
+    );
+
+    return res.json({ applied: Number(id) });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// GET /users/:username/applications
+router.get("/:username/applications", ensureCorrectUserOrAdmin, async function (req, res, next) {
+  try {
+    const { username } = req.params;
+
+    const result = await db.query(
+      `SELECT a.job_id AS "jobId",
+              a.applied_at AS "appliedAt",
+              j.title,
+              j.salary,
+              j.equity,
+              j.company_handle AS "companyHandle",
+              c.name AS "companyName"
+       FROM applications a
+         JOIN jobs j ON j.id = a.job_id
+         JOIN companies c ON c.handle = j.company_handle
+       WHERE a.username = $1
+       ORDER BY a.applied_at DESC`,
+      [username]
+    );
+
+    return res.json({ applications: result.rows });
   } catch (err) {
     return next(err);
   }
